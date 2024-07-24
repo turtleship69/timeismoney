@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,26 +23,26 @@
       align-items: center;
       justify-content: space-between;
       background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 1em;
+      border-radius: 0.25em;
+      box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1);
     }
 
     .calculator input {
-      padding: 10px;
+      padding: 0.625em;
       border: 1px solid #ccc;
-      border-radius: 3px;
-      margin-bottom: 10px;
+      border-radius: 0.1875em;
+      margin-bottom: 0.625em;
       width: 100%;
-      font-size: 16px;
+      font-size: 1em;
     }
 
     .calculator button {
-      padding: 12px 20px;
+      padding: 0.75em 1.25em;
       background-color: #007bff;
       color: #fff;
       border: none;
-      border-radius: 3px;
+      border-radius: 0.1875em;
       cursor: pointer;
     }
 
@@ -50,8 +51,10 @@
     }
 
     p {
-      font-size: 18px;
-      margin-top: 20px;
+      font-size: 1.125em;
+      margin-top: 1.25em;
+      display: none;
+      /* Hide the paragraph by default */
     }
 
     #result {
@@ -60,34 +63,41 @@
   </style>
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
   <h1>How long will it take?</h1>
   <div class="calculator">
     <div>
-      <input type="number" id="hourlyRate" placeholder="Enter rate" style="width: 70px;">
-      <select id="currency">
-        <option value="GBP">GBP</option>
-        <option value="USD">USD</option>
-        <option value="EUR">EUR</option>
-      </select>
-      <select id="timeUnit">
-        <option value="hour">Hour</option>
-        <option value="day">Day</option>
-        <option value="week">Week</option>
-        <option value="year">Year</option>
-      </select>
+      <form>
+        <input type="number" id="hourlyRate" placeholder="Enter rate" style="width: 70px;" step="0.01" min="0">
+        <select id="currency">
+          <option value="GBP">GBP</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </select>
+        <select id="timeUnit">
+          <option value="hour">Hour</option>
+          <option value="day">Day</option>
+          <option value="week">Week</option>
+          <option value="year">Year</option>
+        </select>
     </div>
-    <input type="number" id="amountInput" placeholder="Enter amount">
-    <button id="calculateButton">Calculate</button>
+    <input type="number" id="amountInput" placeholder="Enter amount" step="0.01" min="0">
+    <button type="submit" id="calculateButton">Calculate</button>
+    </form>
+
   </div>
   <p>It would take <span id="result"></span> <span id="timeUnitDisplay"></span> to make that much.</p>
   <script>
+    const form = document.querySelector('form');
     const calculateButton = document.getElementById('calculateButton');
     const resultSpan = document.getElementById('result');
     const hourlyRateInput = document.getElementById('hourlyRate');
     const amountInput = document.getElementById('amountInput');
     const timeUnitSelect = document.getElementById('timeUnit');
     const timeUnitDisplaySpan = document.getElementById('timeUnitDisplay');
+    const resultParagraph = document.querySelector('p'); // Select the result paragraph
+
 
     // Load values from local storage on page load
     const storedRate = localStorage.getItem('rate');
@@ -100,9 +110,22 @@
       timeUnitSelect.value = storedTimeUnit;
     }
 
-    calculateButton.addEventListener('click', () => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
       const rate = parseFloat(hourlyRateInput.value);
       const amount = parseFloat(amountInput.value);
+
+      // Input validation
+      if (isNaN(rate) || rate <= 0) {
+        alert('Please enter a valid positive hourly rate');
+        return;
+      }
+
+      if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid positive amount');
+        return;
+      }
+
       const time = amount / rate;
       const selectedTimeUnit = timeUnitSelect.value;
 
@@ -129,8 +152,10 @@
       localStorage.setItem('rate', rate);
       localStorage.setItem('currency', document.getElementById('currency').value);
       localStorage.setItem('timeUnit', selectedTimeUnit);
+      resultParagraph.style.display = 'block'; // Show the result paragraph
     });
 
   </script>
 </body>
+
 </html>
